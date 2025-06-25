@@ -3,11 +3,13 @@ package io.github.rumpel1107.sphinx.model;
 import java.time.LocalDateTime;
 
 public class BaseItem {
+
 	private Long id;
 	private String title;
 	private String description;
 	private LocalDateTime creationDate;
-
+	
+	// Getters and Setters
 	public Long getId() {
 		return id;
 	}
