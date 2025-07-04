@@ -3,52 +3,48 @@ package io.github.rumpel1107.sphinx;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-//Need to import the own class to use it.
 import io.github.rumpel1107.sphinx.model.Task;
 
 @Controller
 public class HomeController {
 
+	// 1. The list is now a field of the class, it persists between requests.
+	private List<Task> taskList = new ArrayList<>();
+	// 2. A simple counter to generate unique IDs.
+	private final AtomicLong counter = new AtomicLong();
+
+	public HomeController() {
+		// 3. We create the initial tasks in the constructor, only once.
+		taskList.add(new Task(counter.incrementAndGet(), "Set up project on GitHub", "Completed", LocalDateTime.now()));
+		taskList.add(new Task(counter.incrementAndGet(), "Create data model", "Completed", LocalDateTime.now()));
+		taskList.add(new Task(counter.incrementAndGet(), "Display task list on homepage", "Completed", LocalDateTime.now()));
+	}
+
 	@GetMapping("/")
 	public String home(Model model) {
-		
-		//1. Create a list to hold the tasks.
-		List<Task> taskList = new ArrayList<>();
-		
-		//2. Create a first task object and set its properties.
-		Task task1 = new Task();
-		task1.setId(1L);
-		task1.setTitle("Set up project on Github");
-		task1.setStatus("Completed");
-		task1.setCreationDate(LocalDateTime.now());
-
-		//3. Create a second task object.
-		Task task2 = new Task();
-		task2.setId(2L);
-		task2.setTitle("Create data model");
-		task2.setStatus("Completed");
-		task2.setCreationDate(LocalDateTime.now());
-		
-		//4. Create a third task object.
-		Task task3 = new Task();
-		task3.setId(3L);
-		task3.setTitle("Display task list on homepage");
-		task3.setStatus("In Progress");
-		task3.setCreationDate(LocalDateTime.now());
-		
-		// 5. Add the tasks to the list
-        taskList.add(task1);
-        taskList.add(task2);
-        taskList.add(task3);
-
-        // 6. Add the complete list to the model with the tag "tasks"
-        model.addAttribute("tasks", taskList);
-		
+		// Now we just add the existing list to the model.
+		model.addAttribute("tasks", taskList);
 		return "index";
+	}
+
+	@PostMapping("/addTask")
+	public String addTask(@RequestParam("title") String title, @RequestParam("status") String status) {
+
+		// 4. Create a new task with the data from the form.
+		Task newTask = new Task(counter.incrementAndGet(), title, status, LocalDateTime.now());
+
+		// 5. Add the new task to our persistent list.
+		taskList.add(newTask);
+
+		// 6. Redirect to the homepage to see the updated list.
+		return "redirect:/";
 	}
 }

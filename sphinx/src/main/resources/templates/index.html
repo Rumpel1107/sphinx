@@ -27,5 +27,19 @@
 		</tbody>
 	</table>
 
+	<hr>
+	<h2>Add a New Task</h2>
+	<form action="/addTask" method="post">
+		<div>
+			<label for="taskTitle">Title:</label> <input type="text"
+				id="taskTitle" name="title" required>
+		</div>
+		<div>
+			<label for="taskStatus">Status:</label> <input type="text"
+				id="taskStatus" name="status" required>
+		</div>
+		<button type="submit">Add Task</button>
+	</form>
+
 </body>
 </html>
