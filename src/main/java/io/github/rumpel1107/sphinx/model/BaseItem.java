@@ -43,7 +43,7 @@ public class BaseItem {
     public LocalDateTime getCreationDate() {
         return creationDate;
     }
-    
+        
     // Setters only for fields that should be modifiable
     public void setTitle(String title) {
         this.title = title;
