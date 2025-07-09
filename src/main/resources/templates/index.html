@@ -15,14 +15,23 @@
 			<tr>
 				<th>ID</th>
 				<th>Title</th>
+				<th>Description</th>
+				<th>Creation Date</th>
 				<th>Status</th>
+				<th>Actions</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr th:each="task : ${tasks}">
 				<td th:text="${task.id}">1</td>
-				<td th:text="${task.title}">My task title</td>
+				<td th:text="${task.title}">My task title
+				<td th:text="${task.description}">My task description.</td>
+				<td th:text="${task.creationDate}">2025-07-08</td>
 				<td th:text="${task.status}">Pending</td>
+				<td><form action="/deleteTask" method="post">
+					<input type="hidden" name="id" th:value="${task.id}"/>
+					<button type="submit">Delete</button>
+				</form>				
 			</tr>
 		</tbody>
 	</table>

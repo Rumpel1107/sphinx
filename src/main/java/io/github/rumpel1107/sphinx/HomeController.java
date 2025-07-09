@@ -16,9 +16,9 @@ import io.github.rumpel1107.sphinx.model.Task;
 @Controller
 public class HomeController {
 
-	// 1. The list is now a field of the class, it persists between requests.
+	// The list is now a field of the class, it persists between requests.
 	private List<Task> taskList = new ArrayList<>();
-	// 2. A simple counter to generate unique IDs.
+	// A simple counter to generate unique IDs.
 	private final AtomicLong counter = new AtomicLong();
 
 	@GetMapping("/")
@@ -29,15 +29,26 @@ public class HomeController {
 	}
 
 	@PostMapping("/addTask")
-	public String addTask(@RequestParam("title") String title, @RequestParam("description") String description, @RequestParam("status") String status) {
+	public String addTask(@RequestParam("title") String title, @RequestParam("description") String description,
+			@RequestParam("status") String status) {
 
-		// 4. Create a new task with the data from the form.
+		// Create a new task with the data from the form.
 		Task newTask = new Task(counter.incrementAndGet(), title, description, status, LocalDateTime.now());
 
-		// 5. Add the new task to our persistent list.
+		// Add the new task to our persistent list.
 		taskList.add(newTask);
 
-		// 6. Redirect to the homepage to see the updated list.
+		// Redirect to the homepage to see the updated list.
 		return "redirect:/";
+	}
+
+	@PostMapping("/deleteTask")
+	public String deleteTask(@RequestParam("id") Long id) {
+		// We use the removeIf method to find and delete the task with the matching ID.
+		taskList.removeIf(task -> task.getId().equals(id));
+
+		// Redirect to the homepage to show the updated list.
+		return "redirect:/";
+
 	}
 }
