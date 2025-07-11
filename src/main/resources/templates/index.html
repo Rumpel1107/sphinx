@@ -28,34 +28,22 @@
 				<td th:text="${task.description}">My task description.</td>
 				<td th:text="${task.creationDate}">2025-07-08</td>
 				<td th:text="${task.status}">Pending</td>
-				<td><form action="/deleteTask" method="post">
-					<input type="hidden" name="id" th:value="${task.id}"/>
-					<button type="submit">Delete</button>
-				</form>				
+				<td>
+					<a th:href="@{/editTask/{id}(id=${task.id})}">Edit</a>
+					<form action="/deleteTask" method="post" style="display:inline; margin-left: 10px;">
+                        <input type="hidden" name="id" th:value="${task.id}" />
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>						
 			</tr>
 		</tbody>
 	</table>
 
 	<hr>
-	<h2>Add a New Task</h2>
-	<form action="/addTask" method="post">
+		<h2 th:if="${taskToProcess.id == null}">Add a New Task</h2>
+		<h2 th:unless="${taskToProcess.id == null}">Edit Task</h2>
 		
-		<div>
-			<label for="taskTitle">Title:</label>
-			<input type="text" id="taskTitle" name="title" required>
-		</div>
-		
-		<div>
-			<label for="taskDescription">Description:</label>
-			<textarea id="taskDescription" name="description" rows="3"> </textarea>
-		</div>
-		
-		<div>
-			<label for="taskStatus">Status:</label>
-			<input type="text" id="taskStatus" name="status" required>
-		</div>
-		<button type="submit">Add Task</button>
-	</form>
+		<div th:replace = "~{_task-form :: form-body}"></div>
 
 </body>
 </html>
