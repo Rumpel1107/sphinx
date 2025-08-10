@@ -1,12 +1,21 @@
 package io.github.rumpel1107.sphinx.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
+
+@Entity
 public class Task extends BaseItem {
 
 	// Fields specific to Task.
 	private BaseItem.Priority priority;
 	private LocalDateTime dueDate;
+
+	@ManyToMany
+	private List<User> assignedUsers = new ArrayList<>(); // List of users assigned to this task
 	
 	// No-argument constructor.
 	public Task() {

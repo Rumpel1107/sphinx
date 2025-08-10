@@ -2,15 +2,30 @@ package io.github.rumpel1107.sphinx.model;
 
 import java.time.LocalDateTime;
 
-public abstract class BaseItem {
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MappedSuperclass;
 
+@MappedSuperclass
+public abstract class BaseItem {
+	
+	// The Priority enum is defined here, making it accessible to all subclasses.
+	public enum Priority {
+		HIGH, MEDIUM, LOW
+	}
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     private String description;
     private String status;
     private LocalDateTime creationDate;
     private LocalDateTime completionDate;
-    private User user;
+    @ManyToOne
+    private User user; // This field represents the user who created the item.
     
     // No-argument constructor - Required by frameworks.
     public BaseItem() {
