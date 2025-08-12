@@ -50,5 +50,4 @@ public class HomeController {
 		taskRepository.deleteById(id);
 		return "redirect:/";
 	}
-
 }

@@ -26,7 +26,8 @@ public abstract class BaseItem {
     private LocalDateTime completionDate;
     @ManyToOne
     private User user; // This field represents the user who created the item.
-    
+    private boolean isActive = true;
+        
     // No-argument constructor - Required by frameworks.
     public BaseItem() {
     }
@@ -97,4 +98,12 @@ public abstract class BaseItem {
     	this.user = user;
     }
     
+    public boolean isActive() {
+		return isActive;
+	}
+    
+    public void setActive(boolean isActive) {
+		this.isActive = isActive;
+	}
+	
 }
