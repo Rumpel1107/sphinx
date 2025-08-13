@@ -23,8 +23,7 @@ public class User {
 	}
 	
 	// Constructor with essential fields
-	public User(Long id, String name, String email, String username, String password) {
-		this.id = id;
+	public User(String name, String email, String username, String password) {
 		this.name = name;
 		this.email = email;
 		this.username = username;
