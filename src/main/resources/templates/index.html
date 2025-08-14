@@ -1,49 +1,51 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sphinx - Home</title>
+  </head>
 
-<head>
-<meta charset="UTF-8">
-<title>Sphinx - Home</title>
-</head>
+  <body>
+    <h1>Welcome to Sphinx!</h1>
 
-<body>
-	<h1>Welcome to Sphinx!</h1>
+    <h2>My Tasks</h2>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Creation Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="task : ${tasks}">
+          <td th:text="${task.id}">1</td>
+          <td th:text="${task.title}">My task title</td>
+          <td th:text="${task.description}">My task description.</td>
+          <td th:text="${task.creationDate}">2025-07-08</td>
+          <td th:text="${task.status}">Pending</td>
+          <td>
+            <a th:href="@{/tasks/edit/{id}(id=${task.id})}">Edit</a>
+            <form
+              action="/tasks/delete"
+              method="post"
+              style="display: inline; margin-left: 10px"
+            >
+              <input type="hidden" name="id" th:value="${task.id}" />
+              <button type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-	<h2>My Tasks</h2>
-	<table border="1">
-		<thead>
-			<tr>
-				<th>ID</th>
-				<th>Title</th>
-				<th>Description</th>
-				<th>Creation Date</th>
-				<th>Status</th>
-				<th>Actions</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr th:each="task : ${tasks}">
-				<td th:text="${task.id}">1</td>
-				<td th:text="${task.title}">My task title
-				<td th:text="${task.description}">My task description.</td>
-				<td th:text="${task.creationDate}">2025-07-08</td>
-				<td th:text="${task.status}">Pending</td>
-				<td>
-					<a th:href="@{/editTask/{id}(id=${task.id})}">Edit</a>
-					<form action="/deleteTask" method="post" style="display:inline; margin-left: 10px;">
-                        <input type="hidden" name="id" th:value="${task.id}" />
-                        <button type="submit">Delete</button>
-                    </form>
-                </td>						
-			</tr>
-		</tbody>
-	</table>
+    <hr />
+    <h2 th:if="${taskToProcess.id == null}">Add a New Task</h2>
+    <h2 th:unless="${taskToProcess.id == null}">Edit Task</h2>
 
-	<hr>
-		<h2 th:if="${taskToProcess.id == null}">Add a New Task</h2>
-		<h2 th:unless="${taskToProcess.id == null}">Edit Task</h2>
-		
-		<div th:replace = "~{_task-form :: form-body}"></div>
-
-</body>
+    <div th:replace="~{/_task-form :: form-body}"></div>
+  </body>
 </html>

@@ -1,0 +1,99 @@
+package io.github.rumpel1107.sphinx;
+
+import java.time.LocalDateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import io.github.rumpel1107.sphinx.model.BaseItem.Priority;
+import io.github.rumpel1107.sphinx.model.Task;
+import io.github.rumpel1107.sphinx.model.User;
+import io.github.rumpel1107.sphinx.repository.TaskRepository;
+import io.github.rumpel1107.sphinx.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
+
+@Controller
+@RequestMapping("/tasks")
+public class TaskController {
+
+    @Autowired
+    private TaskRepository taskRepository; // Injecting the TaskRepository to interact with the database.
+    @Autowired
+    private UserRepository userRepository; // Injecting the UserRepository to interact with the database.
+
+    private User mockUser;
+
+    @PostConstruct
+    public void init() {
+        // Check if any user already exists in the database
+        if (userRepository.count() == 0) {
+            // If no users exist, create and save the mock user
+            User testUser = new User("Test User", "test@example.com", "testuser", "password");
+            this.mockUser = userRepository.save(testUser);
+        } else {
+            // If users already exist, just grab the first one to act as our mock user
+            this.mockUser = userRepository.findAll().get(0);
+        }
+    }
+
+    @GetMapping
+    public String listTasks(Model model) {
+        // We pass the user's task to the model, not the whole list.
+        model.addAttribute("tasks", taskRepository.findByIsActiveTrue());
+        model.addAttribute("taskToProcess", new Task());
+        return "index";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable("id") Long id, Model model) {
+        // Use the TaskRepository to find the task by ID.
+        Task taskToEdit = taskRepository.findById(id)
+                .orElse(null); // orElse(null) handles the case where the task is not found
+
+        // Add the found task to the model to pre-fill the form
+        model.addAttribute("tasks", taskRepository.findByIsActiveTrue());
+        model.addAttribute("taskToProcess", taskToEdit);
+        return "index";
+    }
+
+    @PostMapping("/save")
+    public String saveTask(@ModelAttribute Task formTask) {
+        if (formTask.getId() == null) {
+            formTask.setCreationDate(LocalDateTime.now());
+            formTask.setPriority(Priority.MEDIUM);
+            formTask.setActive(true);
+            formTask.setUser(mockUser);
+            taskRepository.save(formTask);
+        } else {
+            Task originalTask = taskRepository.findById(formTask.getId()).orElse(null);
+
+            if (originalTask != null) {
+                originalTask.setTitle(formTask.getTitle());
+                originalTask.setDescription(formTask.getDescription());
+                originalTask.setStatus(formTask.getStatus());
+            }
+        }
+        return "redirect:/tasks";
+
+    }
+
+    @PostMapping("/delete")
+    public String deleteTask(@RequestParam("id") Long id) {
+        // Find the task in the database.
+        Task taskToDelete = taskRepository.findById(id)
+                .orElse(null); // orElse(null) handles the case where the task is not found
+
+        if (taskToDelete != null) {
+            taskToDelete.setActive(false);
+            taskRepository.save(taskToDelete); // Save the updated task to mark it as inactive.
+        }
+        return "redirect:/tasks";
+    }
+
+}
