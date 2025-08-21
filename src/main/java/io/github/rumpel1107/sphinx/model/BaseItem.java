@@ -13,7 +13,7 @@ public abstract class BaseItem {
 	
 	// The Priority enum is defined here, making it accessible to all subclasses.
 	public enum Priority {
-		HIGH, MEDIUM, LOW
+		High, Medium, Low
 	}
 
 	@Id

@@ -63,28 +63,32 @@ public class TaskController {
     }
 
     @PostMapping("/save")
-    public String saveTask(@ModelAttribute Task formTask) {
+    public String saveTask(@ModelAttribute Task formTask, @RequestParam("dueDate") String dueDateString, @RequestParam("dueTime") String dueTimeString) {
+    	
+    	
+    	
         if (formTask.getId() == null) {
             formTask.setCreationDate(LocalDateTime.now());
-            formTask.setPriority(Priority.MEDIUM);
+            formTask.setPriority(Priority.Medium); // Default priority
             formTask.setActive(true);
             formTask.setUser(mockUser);
             taskRepository.save(formTask);
         } else {
             Task originalTask = taskRepository.findById(formTask.getId()).orElse(null);
 
-            if (originalTask != null) {
+            if (originalTask != null && originalTask.isActive()) {
                 originalTask.setTitle(formTask.getTitle());
                 originalTask.setDescription(formTask.getDescription());
                 originalTask.setStatus(formTask.getStatus());
+                taskRepository.save(originalTask); // Save the updated task
             }
         }
         return "redirect:/tasks";
 
     }
 
-    @PostMapping("/delete")
-    public String deleteTask(@RequestParam("id") Long id) {
+    @PostMapping("/delete/{id}")
+    public String deleteTask(@PathVariable("id") Long id) {
         // Find the task in the database.
         Task taskToDelete = taskRepository.findById(id)
                 .orElse(null); // orElse(null) handles the case where the task is not found
