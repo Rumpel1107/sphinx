@@ -3,7 +3,7 @@
 
 	<div>
 		<label for="taskTitle">Title:</label>
-		<input type="text" id="taskTitle" th:field="*{title}" required/>
+		<input type="text" id="taskTitle" th:field="*{title}" required />
 	</div>
 	<div>
 		<label for="taskDescription">Description:</label>
@@ -11,24 +11,23 @@
 	</div>
 	<div>
 		<label for="taskStatus">Status:</label>
-		<input type="text" id="taskStatus" th:field="*{status}" required/>
+		<input type="text" id="taskStatus" th:field="*{status}" required />
 	</div>
 
 	<div>
 		<label for="taskPriority">Priority</label>
 		<select id="taskPriority" th:field="*{priority}">
-			<option th:each="p : ${T(io.github.rumpel1107.sphinx.model.BaseItem.Priority).values()}" th:value="${p}" th:text="${p}">
+			<option th:each="p : ${T(io.github.rumpel1107.sphinx.model.BaseItem.Priority).values()}" th:value="${p}"
+				th:text="${p}">
 			</option>
+		</select>
 	</div>
+
 	<div>
 		<label for="taskDueDate">Due Date:</label>
-		<input type="date" id="taskDueDate" name="dueDate" th:field="${taskToProcess.dueDate != null ? #temporals.format(taskToProcess.dueDate, 'yyyy-MM-dd') : ''}" />
+		<input type="date" id="taskDueDate" th:field="*{dueDate}" required />
 	</div>
-	<div>
-		<label for="taskDueTime">Due Time (Optional)</label>
-		<input type="time" id="taskDueTime" name="dueTime" th:field="${taskToProcess.dueTime != null ? #temporals.format(taskToProcess.dueTime, 'HH:mm') : ''}" />
-	</div>
-
 
 	<button type="submit" th:text="${taskToProcess.id == null ? 'Add Task' : 'Update Task'}"></button>
+
 </form>

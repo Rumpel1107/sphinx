@@ -46,7 +46,9 @@ public class TaskController {
     public String listTasks(Model model) {
         // We pass the user's task to the model, not the whole list.
         model.addAttribute("tasks", taskRepository.findByIsActiveTrue());
-        model.addAttribute("taskToProcess", new Task());
+        Task newTask = new Task();
+        newTask.setDueDate(LocalDateTime.now()); // Default due date is today
+        model.addAttribute("taskToProcess", newTask);
         return "index";
     }
 
@@ -63,11 +65,9 @@ public class TaskController {
     }
 
     @PostMapping("/save")
-    public String saveTask(@ModelAttribute Task formTask, @RequestParam("dueDate") String dueDateString, @RequestParam("dueTime") String dueTimeString) {
+    public String saveTask(@ModelAttribute Task formTask, @RequestParam("dueDate") String dueDateString, @RequestParam("dueTime") String dueTimeString)
     	
-    	
-    	
-        if (formTask.getId() == null) {
+    	{if (formTask.getId() == null) {
             formTask.setCreationDate(LocalDateTime.now());
             formTask.setPriority(Priority.Medium); // Default priority
             formTask.setActive(true);

@@ -8,13 +8,16 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
+import jakarta.validation.constraints.NotNull;
+
 
 @Entity
 public class Task extends BaseItem {
 
 	// Fields specific to Task.
 	private BaseItem.Priority priority;
-	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+	@NotNull
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDateTime dueDate;
 
 	@ManyToMany
