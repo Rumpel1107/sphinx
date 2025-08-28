@@ -26,6 +26,7 @@ public class Task extends BaseItem {
 	// No-argument constructor.
 	public Task() {
 		super(); // Calls the empty parent constructor
+		this.priority = priority.Medium; // Default priority
 		}
 	
 	// Constructor with arguments
