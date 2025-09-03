@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+        <meta charset="UTF-8" />
+        <title>Sphinx - Login</title>
+	</head>
+	
+	<body>
+        <h1>Login</h1>
+		
+		<div th:if="${param.error}">
+			<p style="color:red;">Invalid username or password.</p>
+		</div>
+		
+        <form th:action="@{/login}" method="post">
+            <div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required autofocus="autofocus" />
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required />
+				<button type="button" id="togglePassword">Show</button>"
+            </div>
+            <div>
+                <button type="submit">Login</button>
+            </div>
+        </form>
+        		
+		<script>
+			const togglePassword = document.querySelector('#togglePassword');
+            const password = document.querySelector('#password');
+
+            togglePassword.addEventListener('click', function () {
+                // toggle the type of the password field
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+				
+                // toggle the button text
+                this.textContent = type === 'password' ? 'Show' : 'Hide';
+            });
+		</script>
+	</body>
+</html>
+	
