@@ -2,6 +2,7 @@ package io.github.rumpel1107.sphinx;
 
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,6 @@ import io.github.rumpel1107.sphinx.model.Task;
 import io.github.rumpel1107.sphinx.model.User;
 import io.github.rumpel1107.sphinx.repository.TaskRepository;
 import io.github.rumpel1107.sphinx.repository.UserRepository;
-import jakarta.annotation.PostConstruct;
 
 @Controller
 @RequestMapping("/tasks")
@@ -26,21 +26,8 @@ public class TaskController {
     private TaskRepository taskRepository; // Injecting the TaskRepository to interact with the database.
     @Autowired
     private UserRepository userRepository; // Injecting the UserRepository to interact with the database.
-
-    private User mockUser;
-
-    @PostConstruct
-    public void init() {
-        // Check if any user already exists in the database
-        if (userRepository.count() == 0) {
-            // If no users exist, create and save the mock user
-            User testUser = new User("Test User", "test@example.com", "testuser", "password");
-            this.mockUser = userRepository.save(testUser);
-        } else {
-            // If users already exist, just grab the first one to act as our mock user
-            this.mockUser = userRepository.findAll().get(0);
-        }
-    }
+    @Autowired
+    private PasswordEncoder passwordEncoder; // Injecting the PasswordEncoder to encode passwords.
 
     @GetMapping
     public String listTasks(Model model) {
@@ -71,7 +58,8 @@ public class TaskController {
             formTask.setCreationDate(LocalDateTime.now());
             formTask.setPriority(Priority.Medium); // Default priority
             formTask.setActive(true);
-            formTask.setUser(mockUser);
+            User user = userRepository.findAll().get(0); // Get the first user (mock user)
+            formTask.setUser(user);
             taskRepository.save(formTask);
         } else {
             Task originalTask = taskRepository.findById(formTask.getId()).orElse(null);
