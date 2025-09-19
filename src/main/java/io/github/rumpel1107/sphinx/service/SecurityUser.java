@@ -11,6 +11,7 @@ import io.github.rumpel1107.sphinx.model.User;
 
 public class SecurityUser implements UserDetails {
 
+	private static final long serialVersionUID = 1L;
 	private User user;
 	public SecurityUser(User user) {
 		this.user = user;

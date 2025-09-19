@@ -1,8 +1,10 @@
 package io.github.rumpel1107.sphinx;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,11 +28,10 @@ public class TaskController {
     private TaskRepository taskRepository; // Injecting the TaskRepository to interact with the database.
     @Autowired
     private UserRepository userRepository; // Injecting the UserRepository to interact with the database.
-    @Autowired
-    private PasswordEncoder passwordEncoder; // Injecting the PasswordEncoder to encode passwords.
 
     @GetMapping
     public String listTasks(Model model) {
+    	
         // We pass the user's task to the model, not the whole list.
         model.addAttribute("tasks", taskRepository.findByIsActiveTrue());
         Task newTask = new Task();
@@ -41,6 +42,7 @@ public class TaskController {
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable("id") Long id, Model model) {
+    	
         // Use the TaskRepository to find the task by ID.
         Task taskToEdit = taskRepository.findById(id)
                 .orElse(null); // orElse(null) handles the case where the task is not found
@@ -52,28 +54,45 @@ public class TaskController {
     }
 
     @PostMapping("/save")
-    public String saveTask(@ModelAttribute Task formTask, @RequestParam("dueDate") String dueDateString, @RequestParam("dueTime") String dueTimeString)
+    public String saveTask(@ModelAttribute Task formTask, @RequestParam(name = "dueDate", required = false) String dueDateString){
     	
-    	{if (formTask.getId() == null) {
-            formTask.setCreationDate(LocalDateTime.now());
+    	if (dueDateString != null && !dueDateString.isEmpty()) {
+    		LocalDate datePart = LocalDate.parse(dueDateString);
+    		LocalTime timePart;
+    		if (dueTimeString != null && !dueTimeString.isEmpty()) {
+				timePart = LocalTime.parse(dueTimeString);
+			} else {
+				timePart = LocalTime.MAX; // Default to end of day if no time is provided.
+    		}
+    		
+    		LocalDateTime dueDateTime = LocalDateTime.of(datePart, timePart);
+    		formTask.setDueDate(dueDateTime);
+    	}
+    	
+    	if (formTask.getId() == null) {
+    		formTask.setCreationDate(LocalDateTime.now());
             formTask.setPriority(Priority.Medium); // Default priority
             formTask.setActive(true);
             User user = userRepository.findAll().get(0); // Get the first user (mock user)
             formTask.setUser(user);
             taskRepository.save(formTask);
-        } else {
+        }
+    	
+    	else {
             Task originalTask = taskRepository.findById(formTask.getId()).orElse(null);
 
             if (originalTask != null && originalTask.isActive()) {
                 originalTask.setTitle(formTask.getTitle());
                 originalTask.setDescription(formTask.getDescription());
                 originalTask.setStatus(formTask.getStatus());
+                originalTask.setPriority(formTask.getPriority());
+                originalTask.setDueDate(formTask.getDueDate());
                 taskRepository.save(originalTask); // Save the updated task
             }
         }
-        return "redirect:/tasks";
-
-    }
+    	return "redirect:/tasks";
+        
+   }
 
     @PostMapping("/delete/{id}")
     public String deleteTask(@PathVariable("id") Long id) {
@@ -85,7 +104,7 @@ public class TaskController {
             taskToDelete.setActive(false);
             taskRepository.save(taskToDelete); // Save the updated task to mark it as inactive.
         }
+        
         return "redirect:/tasks";
     }
-
 }
