@@ -35,7 +35,7 @@ public class TaskController {
         // We pass the user's task to the model, not the whole list.
         model.addAttribute("tasks", taskRepository.findByIsActiveTrue());
         Task newTask = new Task();
-        newTask.setDueDate(LocalDateTime.now()); // Default due date is today
+        newTask.setDueDate(LocalDate.now().atStartOfDay()); // Default due date is today
         model.addAttribute("taskToProcess", newTask);
         return "index";
     }
@@ -46,6 +46,10 @@ public class TaskController {
         // Use the TaskRepository to find the task by ID.
         Task taskToEdit = taskRepository.findById(id)
                 .orElse(null); // orElse(null) handles the case where the task is not found
+        
+        if (taskToEdit == null) {
+        	return "redirect:/tasks"; // Redirect to the task list if the task is not found
+        }
 
         // Add the found task to the model to pre-fill the form
         model.addAttribute("tasks", taskRepository.findByIsActiveTrue());
@@ -54,20 +58,19 @@ public class TaskController {
     }
 
     @PostMapping("/save")
-    public String saveTask(@ModelAttribute Task formTask, @RequestParam(name = "dueDate", required = false) String dueDateString){
+    public String saveTask(@ModelAttribute Task formTask, @RequestParam(name = "dueDate", required = false) String dueDateString)
+    {
     	
-    	if (dueDateString != null && !dueDateString.isEmpty()) {
+    	if (dueDateString != null && !dueDateString.isEmpty())
+    	{
     		LocalDate datePart = LocalDate.parse(dueDateString);
-    		LocalTime timePart;
-    		if (dueTimeString != null && !dueTimeString.isEmpty()) {
-				timePart = LocalTime.parse(dueTimeString);
-			} else {
-				timePart = LocalTime.MAX; // Default to end of day if no time is provided.
+    		formTask.setDueDate(datePart.atTime(LocalTime.MAX));
     		}
-    		
-    		LocalDateTime dueDateTime = LocalDateTime.of(datePart, timePart);
-    		formTask.setDueDate(dueDateTime);
+    	else {
+    		formTask.setDueDate(null);
     	}
+
+    	
     	
     	if (formTask.getId() == null) {
     		formTask.setCreationDate(LocalDateTime.now());
@@ -75,7 +78,6 @@ public class TaskController {
             formTask.setActive(true);
             User user = userRepository.findAll().get(0); // Get the first user (mock user)
             formTask.setUser(user);
-            taskRepository.save(formTask);
         }
     	
     	else {
@@ -87,9 +89,10 @@ public class TaskController {
                 originalTask.setStatus(formTask.getStatus());
                 originalTask.setPriority(formTask.getPriority());
                 originalTask.setDueDate(formTask.getDueDate());
-                taskRepository.save(originalTask); // Save the updated task
             }
         }
+    	
+        taskRepository.save(formTask);    	
     	return "redirect:/tasks";
         
    }

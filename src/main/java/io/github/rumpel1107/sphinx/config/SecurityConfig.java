@@ -21,6 +21,7 @@ public class SecurityConfig {
 					)
 			.formLogin(form -> form
 					.loginPage("/login")
+					.defaultSuccessUrl("/tasks", true)
 					.permitAll()
 			);
 		
