@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import io.github.rumpel1107.sphinx.model.BaseItem.Priority;
 import io.github.rumpel1107.sphinx.model.Task;
-import io.github.rumpel1107.sphinx.model.User;
 import io.github.rumpel1107.sphinx.repository.TaskRepository;
 import io.github.rumpel1107.sphinx.repository.UserRepository;
 
@@ -33,10 +31,11 @@ public class TaskController {
     public String listTasks(Model model) {
     	
         // We pass the user's task to the model, not the whole list.
+    	Task newTask = new Task();
+    	newTask.setDueDate(LocalDate.now().atStartOfDay());
         model.addAttribute("tasks", taskRepository.findByIsActiveTrue());
-        Task newTask = new Task();
-        newTask.setDueDate(LocalDate.now().atStartOfDay()); // Default due date is today
         model.addAttribute("taskToProcess", newTask);
+        model.addAttribute("user", userRepository.findAll().get(0));
         return "index";
     }
 
@@ -58,41 +57,46 @@ public class TaskController {
     }
 
     @PostMapping("/save")
-    public String saveTask(@ModelAttribute Task formTask, @RequestParam(name = "dueDate", required = false) String dueDateString)
-    {
+    public String saveTask(@ModelAttribute Task formTask, @RequestParam(name = "dueDate", required = false) String dueDateString){
     	
-    	if (dueDateString != null && !dueDateString.isEmpty())
-    	{
+    	if (dueDateString != null && !dueDateString.isEmpty()){
+    		
     		LocalDate datePart = LocalDate.parse(dueDateString);
     		formTask.setDueDate(datePart.atTime(LocalTime.MAX));
     		}
     	else {
+    		
     		formTask.setDueDate(null);
     	}
-
     	
-    	
+    	Task taskToSave;
     	if (formTask.getId() == null) {
-    		formTask.setCreationDate(LocalDateTime.now());
-            formTask.setPriority(Priority.Medium); // Default priority
-            formTask.setActive(true);
-            User user = userRepository.findAll().get(0); // Get the first user (mock user)
-            formTask.setUser(user);
+    		
+    		taskToSave = formTask;
+    		taskToSave.setCreationDate(LocalDateTime.now());
+    		taskToSave.setActive(true);
+    		taskToSave.setUser(userRepository.findAll().get(0));
         }
     	
     	else {
-            Task originalTask = taskRepository.findById(formTask.getId()).orElse(null);
+    		
+    		taskToSave = taskRepository.findById(formTask.getId()).orElse(null);
 
-            if (originalTask != null && originalTask.isActive()) {
-                originalTask.setTitle(formTask.getTitle());
-                originalTask.setDescription(formTask.getDescription());
-                originalTask.setStatus(formTask.getStatus());
-                originalTask.setPriority(formTask.getPriority());
-                originalTask.setDueDate(formTask.getDueDate());
+            if (taskToSave != null) {
+
+            	taskToSave.setTitle(formTask.getTitle());
+            	taskToSave.setDescription(formTask.getDescription());
+            	taskToSave.setStatus(formTask.getStatus());
+            	taskToSave.setPriority(formTask.getPriority());
+            	taskToSave.setDueDate(formTask.getDueDate());
             }
         }
     	
-        taskRepository.save(formTask);    	
+    	if (taskToSave != null) {
+    		
+    		taskRepository.save(taskToSave);
+    	}
+
     	return "redirect:/tasks";
         
    }
