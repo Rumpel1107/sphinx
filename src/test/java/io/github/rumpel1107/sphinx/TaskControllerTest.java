@@ -5,7 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ public class TaskControllerTest {
 		User user = new User("Test User", "test@example.com", "testuser", "password");
 		userRepository.save(user);
 		
-		Task task = new Task("Test Title", "Test Description", "Pending", user, BaseItem.Priority.High, LocalDateTime.now());
+		Task task = new Task("Test Title", "Test Description", "Pending", user, BaseItem.Priority.High, LocalDate.now());
 		taskRepository.save(task);
 
 		// Act & Assert: Perform GET request to edit the task and verify the response

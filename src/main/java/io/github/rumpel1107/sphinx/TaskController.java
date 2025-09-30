@@ -2,7 +2,6 @@ package io.github.rumpel1107.sphinx;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import io.github.rumpel1107.sphinx.model.Task;
 import io.github.rumpel1107.sphinx.repository.TaskRepository;
@@ -32,7 +30,7 @@ public class TaskController {
     	
         // We pass the user's task to the model, not the whole list.
     	Task newTask = new Task();
-    	newTask.setDueDate(LocalDate.now().atStartOfDay());
+    	newTask.setDueDate(LocalDate.now());
         model.addAttribute("tasks", taskRepository.findByIsActiveTrue());
         model.addAttribute("taskToProcess", newTask);
         model.addAttribute("user", userRepository.findAll().get(0));
@@ -57,17 +55,7 @@ public class TaskController {
     }
 
     @PostMapping("/save")
-    public String saveTask(@ModelAttribute Task formTask, @RequestParam(name = "dueDate", required = false) String dueDateString){
-    	
-    	if (dueDateString != null && !dueDateString.isEmpty()){
-    		
-    		LocalDate datePart = LocalDate.parse(dueDateString);
-    		formTask.setDueDate(datePart.atTime(LocalTime.MAX));
-    		}
-    	else {
-    		
-    		formTask.setDueDate(null);
-    	}
+    public String saveTask(@ModelAttribute("taskToProcess") Task formTask){
     	
     	Task taskToSave;
     	if (formTask.getId() == null) {
@@ -76,28 +64,30 @@ public class TaskController {
     		taskToSave.setCreationDate(LocalDateTime.now());
     		taskToSave.setActive(true);
     		taskToSave.setUser(userRepository.findAll().get(0));
-        }
+    		}
     	
     	else {
     		
     		taskToSave = taskRepository.findById(formTask.getId()).orElse(null);
 
             if (taskToSave != null) {
-
+            	
             	taskToSave.setTitle(formTask.getTitle());
             	taskToSave.setDescription(formTask.getDescription());
             	taskToSave.setStatus(formTask.getStatus());
             	taskToSave.setPriority(formTask.getPriority());
             	taskToSave.setDueDate(formTask.getDueDate());
+            	
             }
         }
     	
     	if (taskToSave != null) {
-    		
-    		taskRepository.save(taskToSave);
-    	}
+			taskRepository.save(taskToSave); // Save the task to the database.
 
-    	return "redirect:/tasks";
+    	}
+		
+		return "redirect:/tasks"; // Redirect to the task list after saving.
+
         
    }
 

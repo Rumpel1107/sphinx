@@ -24,8 +24,8 @@
 	</div>
 
 	<div>
-		<label for="taskDueDate">Due Date:</label>
-		<input type="date" id="taskDueDate" name="dueDate" th:value="${taskToProcess.dueDate != null ? #temporals.format(taskToProcess.dueDate, 'yyyy-MM-dd') : ''}" required />
+		<label for="dueDate">Due Date:</label>
+		<input type="date" name="dueDate" id="dueDate" th:value="${taskToProcess.dueDate != null ? #temporals.format(taskToProcess.dueDate, 'yyyy-MM-dd') : ''}" required />
 	</div>
 
 	<button type="submit" th:text="${taskToProcess.id == null ? 'Add Task' : 'Update Task'}"></button>
