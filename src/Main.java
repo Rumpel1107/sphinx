@@ -1,23 +1,36 @@
-import java.util.Scanner;
-import java.util.Locale;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.InputMismatchException;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.io.IOException;
+import java.util.Locale;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
         scanner.useLocale(Locale.US);
-
         String fileName = "balance.csv";
 
-        try (FileWriter fileWriter = new FileWriter(fileName);
+        savetoCSV(scanner, fileName);
+
+        scanner.close();
+
+    }
+
+    public static void savetoCSV(Scanner scanner, String fileName) {
+
+        File newFile = new File(fileName);
+        boolean isNew = !newFile.exists();
+
+        try (FileWriter fileWriter = new FileWriter(fileName, true);
                 PrintWriter printWriter = new PrintWriter(fileWriter);) {
 
-            printWriter.println("Tipo,Valor,Categoria");
+            if (isNew) {
+                printWriter.println("Tipo,Valor,Categoria");
+            }
             BigDecimal income = getValue(scanner, "Ingresa El valor de tu ingreso: ");
             BigDecimal sumExpences = BigDecimal.ZERO;
             scanner.nextLine();
@@ -58,9 +71,6 @@ public class Main {
         } catch (IOException e) {
             System.out.println("Error al escribir el archivo: " + e.getMessage());
         }
-
-        scanner.close();
-
     }
 
     public static BigDecimal getValue(Scanner scanner, String message) {
@@ -76,4 +86,5 @@ public class Main {
 
         }
     }
+
 }
